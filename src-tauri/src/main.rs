@@ -2,13 +2,13 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    // Elevated sensor helper, started by the "Sysrewind Sensors" scheduled task.
+    // Elevated sensor helper, started by the "Systana Sensors" scheduled task.
     #[cfg(windows)]
     {
         let args: Vec<String> = std::env::args().collect();
         if args.iter().any(|a| a == "--sensors") {
-            std::process::exit(sysrewind_lib::run_sensor_helper(args.iter().any(|a| a == "--once")));
+            std::process::exit(systana_lib::run_sensor_helper(args.iter().any(|a| a == "--once")));
         }
     }
-    sysrewind_lib::run()
+    systana_lib::run()
 }

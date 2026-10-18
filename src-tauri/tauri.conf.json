@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Sysrewind",
-  "version": "0.1.1",
-  "identifier": "com.sysrewind.app",
+  "productName": "Systana",
+  "version": "0.2.0",
+  "identifier": "com.systana.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Sysrewind",
+        "title": "Systana",
         "width": 1280,
         "height": 840,
         "minWidth": 760,
@@ -34,9 +34,9 @@
     "publisher": "nocmtriosmith-h1",
     "copyright": "Copyright (c) 2026 nocmtriosmith-h1. MIT License.",
     "category": "Utility",
-    "homepage": "https://github.com/nocmtriosmith-h1/sysrewind",
+    "homepage": "https://github.com/nocmtriosmith-h1/systana",
     "shortDescription": "Rewind your PC: a tiny recorder for CPU, RAM, disk, GPU and temperature history.",
-    "longDescription": "Sysrewind quietly records CPU, RAM, disk, GPU, network and temperature in the background and explains, in plain words, why your computer was slow at any moment. Heavily inspired by Grafana and Prometheus.",
+    "longDescription": "Systana quietly records CPU, RAM, disk, GPU, network and temperature in the background and explains, in plain words, why your computer was slow at any moment. Heavily inspired by Grafana and Prometheus.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

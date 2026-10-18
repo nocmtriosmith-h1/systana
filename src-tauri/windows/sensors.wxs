@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   MSI counterpart of hooks.nsh: set up / tear down the elevated temperature helper.
-  Tauri links this fragment through the SysrewindSensorsComponent ComponentRef
+  Tauri links this fragment through the SystanaSensorsComponent ComponentRef
   (tauri.windows.conf.json → wix.componentRefs), which pulls in the custom actions below.
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
-      <Component Id="SysrewindSensorsComponent" Guid="7B2E6C1A-4E5D-4C61-9D0B-2F8A5E3C9A14">
-        <RegistryValue Root="HKLM" Key="Software\Sysrewind" Name="SensorsSetup" Type="integer" Value="1" KeyPath="yes" />
+      <Component Id="SystanaSensorsComponent" Guid="AB123643-39E7-4392-9DDE-9BDB46BDDF42">
+        <RegistryValue Root="HKLM" Key="Software\Systana" Name="SensorsSetup" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </DirectoryRef>
 
     <!-- "[INSTALLDIR]." avoids a trailing backslash escaping the closing quote. -->
-    <CustomAction Id="SysrewindStopSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
+    <CustomAction Id="SystanaStopSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
       ExeCommand="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;[INSTALLDIR]uninstall-sensors.ps1&quot;" />
-    <CustomAction Id="SysrewindInstallSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
+    <CustomAction Id="SystanaInstallSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
       ExeCommand="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;[INSTALLDIR]install-sensors.ps1&quot; -InstallDir &quot;[INSTALLDIR].&quot;" />
-    <CustomAction Id="SysrewindRemoveSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
+    <CustomAction Id="SystanaRemoveSensors" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="ignore"
       ExeCommand="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;[INSTALLDIR]uninstall-sensors.ps1&quot; -Remove" />
 
     <InstallExecuteSequence>
-      <!-- Release the lock on sysrewind.exe before an upgrade replaces it. -->
-      <Custom Action="SysrewindStopSensors" Before="RemoveExistingProducts">Installed OR WIX_UPGRADE_DETECTED</Custom>
-      <Custom Action="SysrewindRemoveSensors" Before="RemoveFiles">REMOVE~="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="SysrewindInstallSensors" Before="InstallFinalize">NOT REMOVE~="ALL"</Custom>
+      <!-- Release the lock on systana.exe before an upgrade replaces it. -->
+      <Custom Action="SystanaStopSensors" Before="RemoveExistingProducts">Installed OR WIX_UPGRADE_DETECTED</Custom>
+      <Custom Action="SystanaRemoveSensors" Before="RemoveFiles">REMOVE~="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="SystanaInstallSensors" Before="InstallFinalize">NOT REMOVE~="ALL"</Custom>
     </InstallExecuteSequence>
   </Fragment>
 </Wix>

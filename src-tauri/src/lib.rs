@@ -11,7 +11,7 @@ mod pdh;
 mod sensors;
 mod temps;
 
-/// Entry point for `sysrewind.exe --sensors` (see sensors.rs).
+/// Entry point for `systana.exe --sensors` (see sensors.rs).
 #[cfg(windows)]
 pub fn run_sensor_helper(once: bool) -> i32 {
     sensors::run_helper(once)
@@ -47,6 +47,35 @@ fn show_main(app: &AppHandle) {
     }
 }
 
+/// Systana was called Sysrewind up to v0.1.1 (identifier `com.sysrewind.app`).
+/// On the first start after the rename, move the old history over and drop the old
+/// start-with-Windows entry, which points at an exe the installer has removed.
+/// Returns true when old history was moved, so the caller re-enables start-with-Windows under the new name.
+fn migrate_from_sysrewind(dir: &std::path::Path) -> bool {
+    let Some(old) = dir.parent().map(|p| p.join("com.sysrewind.app")) else { return false };
+    if dir.join("metrics.db").exists() || !old.join("metrics.db").exists() {
+        return false;
+    }
+    for f in ["metrics.db", "metrics.db-wal", "metrics.db-shm"] {
+        let (from, to) = (old.join(f), dir.join(f));
+        if from.exists() && std::fs::rename(&from, &to).is_err() {
+            let _ = std::fs::copy(&from, &to);
+        }
+    }
+    let _ = std::fs::remove_dir(&old); // only succeeds when empty
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        let system32 = std::env::var_os("SystemRoot").map(std::path::PathBuf::from).unwrap_or_else(|| r"C:\Windows".into()).join("System32");
+        let _ = std::process::Command::new(system32.join("reg.exe"))
+            .args(["delete", r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run", "/v", "Sysrewind", "/f"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .output();
+    }
+    true
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -57,13 +86,14 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             let db_path = dir.join("metrics.db");
+            let migrated = migrate_from_sysrewind(&dir);
             let conn = db::open(&db_path)?;
 
             // Zero config: turn on start-with-Windows the first time the app runs.
             // Dev builds skip this so they never register target\debug\*.exe.
             if !cfg!(debug_assertions) {
                 let autolaunch = app.autolaunch();
-                if db::get_setting(&conn, "autostart_initialized").is_none() {
+                if migrated || db::get_setting(&conn, "autostart_initialized").is_none() {
                     let _ = autolaunch.enable();
                     db::set_setting(&conn, "autostart_initialized", "1")?;
                 } else if autolaunch.is_enabled().unwrap_or(false) {
@@ -77,11 +107,11 @@ pub fn run() {
             collector::spawn(db_path.clone(), latest.clone(), paused.clone());
             app.manage(AppState { db: Mutex::new(conn), icons: Mutex::default(), db_path, latest, paused });
 
-            let open = MenuItem::with_id(app, "open", "Mở Sysrewind / Open", true, None::<&str>)?;
+            let open = MenuItem::with_id(app, "open", "Mở Systana / Open", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Thoát / Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&open, &quit])?;
             let mut tray = TrayIconBuilder::with_id("main")
-                .tooltip("Sysrewind")
+                .tooltip("Systana")
                 .menu(&menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, e| match e.id.as_ref() {
@@ -118,7 +148,7 @@ pub fn run() {
             commands::set_language,
         ])
         .build(tauri::generate_context!())
-        .expect("error while building Sysrewind")
+        .expect("error while building Systana")
         .run(|_app, event| {
             // Closing the last window keeps recording in the tray.
             // Only "Quit" in the tray menu (app.exit, which sets a code) really exits.

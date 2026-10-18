@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Sysrewind logo A "Rewind Pulse": rewind chevrons flowing into a pulse line. -->
+  <!-- Systana logo A "Rewind Pulse": rewind chevrons flowing into a pulse line. -->
   <rect x="2" y="2" width="96" height="96" rx="24" fill="#4C8DFF"/>
   <path d="M33 34 L19 50 L33 66" fill="none" stroke="#0B0D10" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
   <path d="M47 34 L33 50 L47 66" fill="none" stroke="#0B0D10" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>

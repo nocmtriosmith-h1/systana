@@ -1,10 +1,10 @@
 [package]
-name = "sysrewind"
-version = "0.1.1"
+name = "systana"
+version = "0.2.0"
 edition = "2021"
 
 [lib]
-name = "sysrewind_lib"
+name = "systana_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

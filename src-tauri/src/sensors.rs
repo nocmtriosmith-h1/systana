@@ -1,7 +1,7 @@
-//! Elevated sensor helper (`sysrewind.exe --sensors`).
+//! Elevated sensor helper (`systana.exe --sensors`).
 //!
 //! The installer registers a scheduled task that runs this mode as SYSTEM at boot. It reads
-//! CPU temperature through the PawnIO driver (signed, installed alongside Sysrewind) and disk
+//! CPU temperature through the PawnIO driver (signed, installed alongside Systana) and disk
 //! temperature through SMART, then writes them to a small JSON file that the normal,
 //! non-elevated app reads. The UI itself never runs elevated.
 //!
@@ -31,10 +31,10 @@ pub struct Reading {
     pub source: String,
 }
 
-/// `C:\ProgramData\Sysrewind\sensors.json`: written by SYSTEM, readable by every user.
+/// `C:\ProgramData\Systana\sensors.json`: written by SYSTEM, readable by every user.
 pub fn reading_path() -> PathBuf {
     let base = std::env::var_os("ProgramData").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(r"C:\ProgramData"));
-    base.join("Sysrewind").join("sensors.json")
+    base.join("Systana").join("sensors.json")
 }
 
 fn now_secs() -> i64 {
@@ -252,13 +252,22 @@ fn sample(pawn: &Option<PawnIo>, disks: &DiskTemps) -> Reading {
     }
 }
 
+/// Writes as SYSTEM, so it never follows a link: the folder must already exist (the installer
+/// creates it with locked-down permissions) and must not be a junction or symlink, and the temp
+/// file is always created fresh rather than opened, so a planted link or hard link is never written through.
 fn write_atomically(r: &Reading) -> std::io::Result<()> {
+    use std::io::{Error, ErrorKind, Write};
     let path = reading_path();
-    if let Some(dir) = path.parent() {
-        std::fs::create_dir_all(dir)?;
+    let dir = path.parent().ok_or_else(|| Error::from(ErrorKind::NotFound))?;
+    let meta = std::fs::symlink_metadata(dir)?;
+    if !meta.is_dir() || meta.file_type().is_symlink() {
+        return Err(Error::new(ErrorKind::PermissionDenied, "sensor folder is not a plain directory"));
     }
     let tmp = path.with_extension("json.tmp");
-    std::fs::write(&tmp, serde_json::to_vec(r).unwrap_or_default())?;
+    let _ = std::fs::remove_file(&tmp); // removes a stale file or link itself, never its target
+    let mut f = std::fs::OpenOptions::new().write(true).create_new(true).open(&tmp)?;
+    f.write_all(&serde_json::to_vec(r).unwrap_or_default())?;
+    drop(f);
     std::fs::rename(tmp, path)
 }
 

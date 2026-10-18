@@ -56,7 +56,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "Sysrewind ${{ github.ref_name }}"
+          releaseName: "Systana ${{ github.ref_name }}"
           releaseBody: "See the assets below. Windows: download the -setup.exe (recommended) or the .msi."
           releaseDraft: true
           prerelease: false

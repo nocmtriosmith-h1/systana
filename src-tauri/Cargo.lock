@@ -3541,8 +3541,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "sysrewind"
-version = "0.1.1"
+name = "systana"
+version = "0.2.0"
 dependencies = [
  "base64 0.22.1",
  "libloading 0.8.9",

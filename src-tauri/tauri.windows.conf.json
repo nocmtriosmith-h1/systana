@@ -17,7 +17,7 @@
       "wix": {
         "language": "en-US",
         "fragmentPaths": ["./windows/sensors.wxs"],
-        "componentRefs": ["SysrewindSensorsComponent"]
+        "componentRefs": ["SystanaSensorsComponent"]
       }
     }
   }

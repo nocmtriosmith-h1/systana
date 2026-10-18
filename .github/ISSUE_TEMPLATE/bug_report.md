@@ -14,12 +14,12 @@ labels: bug
 
 **Your PC**
 - Windows version:
-- Sysrewind version:
+- Systana version:
 - CPU:
 - GPU:
 
 **Temperature problems only:** paste the output of this command, run in an *administrator* terminal:
 
 ```
-"C:\Program Files\Sysrewind\sysrewind.exe" --sensors --once
+"C:\Program Files\Systana\systana.exe" --sensors --once
 ```

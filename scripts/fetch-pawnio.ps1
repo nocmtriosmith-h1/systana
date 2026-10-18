@@ -1,4 +1,4 @@
-# Downloads the official, signed PawnIO installer that the Sysrewind installer bundles.
+# Downloads the official, signed PawnIO installer that the Systana installer bundles.
 # Run once before `npm run tauri build`. The file is not committed to git.
 $ErrorActionPreference = "Stop"
 

@@ -1,4 +1,4 @@
-# Contributing to Sysrewind
+# Contributing to Systana
 
 Thanks for helping! Bug reports, ideas, translations and pull requests are all welcome.
 
@@ -9,7 +9,7 @@ Open an issue with the **Bug report** template. Please include:
 - Windows version (Settings → System → About)
 - CPU and GPU model
 - What you expected and what happened
-- If it is about temperatures: the output of `"C:\Program Files\Sysrewind\sysrewind.exe" --sensors --once` run from an **administrator** terminal
+- If it is about temperatures: the output of `"C:\Program Files\Systana\systana.exe" --sensors --once` run from an **administrator** terminal
 
 ## Making a change
 

@@ -41,7 +41,7 @@ pub struct Snapshot {
     pub gpu_temp: Option<f64>,
     pub disk_temp: Option<f64>,
     pub temp_source: String,
-    /// Sysrewind's own footprint (collector process only, not the WebView2 window).
+    /// Systana's own footprint (collector process only, not the WebView2 window).
     pub self_mem: u64,
     pub self_cpu: f64,
     pub top: Vec<AppUsage>,
@@ -70,10 +70,13 @@ fn app_name(raw: &str) -> String {
 pub fn spawn(db_path: PathBuf, latest: Latest, paused: Arc<AtomicBool>) {
     std::thread::Builder::new()
         .name("collector".into())
-        .spawn(move || {
-            if let Err(e) = run(db_path, latest, paused) {
-                eprintln!("collector stopped: {e}");
+        .spawn(move || loop {
+            // A database error (disk full, file locked too long...) must not stop recording for good:
+            // log it, wait, reopen the database and carry on.
+            if let Err(e) = run(db_path.clone(), latest.clone(), paused.clone()) {
+                eprintln!("collector error, restarting in 30 s: {e}");
             }
+            std::thread::sleep(Duration::from_secs(30));
         })
         .expect("spawn collector thread");
 }

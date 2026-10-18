@@ -1,7 +1,7 @@
 //! Picks the best available temperature source for the platform.
 //!
 //! Windows (no admin needed in the app itself):
-//! 1. Sysrewind's elevated helper (`--sensors`, PawnIO + SMART), see sensors.rs.
+//! 1. Systana's elevated helper (`--sensors`, PawnIO + SMART), see sensors.rs.
 //! 2. LibreHardwareMonitor's WMI provider (root\LibreHardwareMonitor) when the user runs LHM.
 //! 3. NVIDIA NVML for NVIDIA GPU temperature.
 //! 4. The ACPI thermal zone, only once it has proven to move (many machines report a constant).

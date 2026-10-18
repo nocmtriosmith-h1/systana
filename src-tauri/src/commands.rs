@@ -42,12 +42,21 @@ pub fn get_top_apps(state: State<AppState>, from: i64, to: i64, metric: String) 
     db::top_apps(&conn, from, to, &metric).map_err(err)
 }
 
+/// Only `C:\...` style paths (optionally with the `\\?\` prefix). Network paths are refused:
+/// reading an icon from `\\host\share` would make Windows connect to that host and send the user's credentials.
+fn is_local_path(p: &str) -> bool {
+    let p = p.strip_prefix(r"\\?\").unwrap_or(p);
+    let b = p.as_bytes();
+    b.len() >= 3 && b[0].is_ascii_alphabetic() && b[1] == b':' && (b[2] == b'\\' || b[2] == b'/')
+        || cfg!(not(windows)) && p.starts_with('/')
+}
+
 #[tauri::command]
 pub fn get_app_icon(state: State<AppState>, name: String) -> Option<String> {
     if let Some(cached) = state.icons.lock().ok()?.get(&name) {
         return cached.clone();
     }
-    let exe = state.db.lock().ok().and_then(|conn| db::app_exe(&conn, &name));
+    let exe = state.db.lock().ok().and_then(|conn| db::app_exe(&conn, &name)).filter(|p| is_local_path(p));
     #[cfg(windows)]
     let icon = exe.and_then(|p| crate::icons::icon_data_url(std::path::Path::new(&p)));
     // Other platforms: letter tiles for now.
@@ -115,6 +124,24 @@ pub fn set_paused(state: State<AppState>, paused: bool) {
 
 #[tauri::command]
 pub fn set_language(state: State<AppState>, language: String) -> CmdResult<()> {
+    if !matches!(language.as_str(), "vi" | "en") {
+        return Err(format!("unsupported language: {language}"));
+    }
     let conn = state.db.lock().map_err(err)?;
     db::set_setting(&conn, "language", &language).map_err(err)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    #[cfg(windows)]
+    fn local_paths_only() {
+        use super::is_local_path;
+        assert!(is_local_path(r"C:\Program Files\App\app.exe"));
+        assert!(is_local_path(r"\\?\C:\Windows\notepad.exe"));
+        assert!(!is_local_path(r"\\attacker\share\x.exe"));
+        assert!(!is_local_path(r"\\?\UNC\attacker\share\x.exe"));
+        assert!(!is_local_path(r"\\.\pipe\x"));
+        assert!(!is_local_path("relative.exe"));
+    }
 }
