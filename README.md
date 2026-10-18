@@ -17,10 +17,6 @@
   <a href="#tiếng-việt">Tiếng Việt</a>
 </p>
 
-<p align="center">
-  <img src="docs/screenshot.png" width="900" alt="Systana overview: KPI cards, insights, performance chart and busiest apps">
-</p>
-
 ---
 
 > Systana was called **Sysrewind** until v0.1.1. Installing v0.2.0 or later on Windows removes the old app and keeps your history.
