@@ -6,6 +6,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { setLang, getLang, t } from "./i18n.js";
 import * as f from "./format.js";
 import { makeChart, sparkline, cssVar } from "./chart.js";
+import defaultIcon from "./default-app-icon.webp";
 
 const RANGES = [900, 3600, 86400, 604800, 2592000];
 const LIVE_MS = 5000;
@@ -287,14 +288,14 @@ function drawMainChart() {
 // ---------- app icons ----------
 const iconCache = new Map(); // name -> Promise<data URL | null>
 
-/** Replaces a letter tile with the app's real icon once it has been extracted from its exe. */
+/** Replaces a letter tile with the app's real icon once it has been extracted from its exe.
+ *  Apps without an icon of their own (dwm, csrss, System...) get the generic Windows executable icon. */
 function fillIcon(tile, name) {
   if (!tile || !name) return;
   if (!iconCache.has(name)) iconCache.set(name, call("get_app_icon", { name }));
   iconCache.get(name).then((url) => {
-    if (!url) return;
     const img = document.createElement("img");
-    img.src = url;
+    img.src = url || defaultIcon;
     img.alt = "";
     tile.replaceChildren(img);
     tile.classList.add("has-icon");

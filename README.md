@@ -153,6 +153,24 @@ Tests and lint: `cd src-tauri && cargo test --lib && cargo clippy --all-targets 
 Bug reports, ideas and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 Found a security issue? Please report it privately, as described in [SECURITY.md](SECURITY.md).
 
+## Privacy
+
+Sysrewind does not send any data anywhere. There is no telemetry, no account and no network access.
+Everything it records stays on your computer (see the FAQ for the exact folder) and is deleted when it is older than the history length you choose.
+
+## Code signing policy
+
+Windows installers are built from this repository by GitHub Actions ([release workflow](.github/workflows/release.yml)); nothing is built on a personal machine.
+Code signing is being set up; until then, releases are unsigned and their SHA-256 hashes are listed on each release page.
+
+| Role | Members |
+|---|---|
+| Authors / committers | [@nocmtriosmith-h1](https://github.com/nocmtriosmith-h1) |
+| Reviewers (pull requests from contributors) | [@nocmtriosmith-h1](https://github.com/nocmtriosmith-h1) |
+| Release approvers | [@nocmtriosmith-h1](https://github.com/nocmtriosmith-h1) |
+
+The installer bundles the unmodified, upstream-signed [PawnIO](https://pawnio.eu) driver installer (see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
+
 ## License
 
 [MIT](LICENSE) — free to use, modify, fork and share. Bundled third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

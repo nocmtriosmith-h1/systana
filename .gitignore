@@ -6,3 +6,4 @@ src-tauri/target-test/
 src-tauri/vendor/
 PROGRESS.md
 docs/*.tmp.png
+SIGNPATH_APPLICATION.md
